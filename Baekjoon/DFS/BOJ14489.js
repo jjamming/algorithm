@@ -1,4 +1,4 @@
-// 스타트와 링크 #14889, DFS
+// 스타트와 링크 #14889, 삼성문제집
 let input = require("fs").readFileSync("/dev/stdin").toString().split("\n");
 
 let n = Number(input[0]);
