@@ -1,22 +1,55 @@
-// 주유소 #13350, Greedy
-let input = require("fs").readFileSync("/dev/stdin").toString().split("\n");
+//DSLR #9019
+const input = require("fs").readFileSync("/dev/stdin").toString().split("\n");
 
-let city = Number(input[0]);
-let distance=input[1].split(" ").map(Number);;
-let price=input[2].split(" ").map(Number);
+const T = Number(input[0]);
 
-// 현재 최소 기름값 < 다음 위치 기름값 ? 가격 = 현재 최소 값 * 현재-다음 거리. : 가격 =  현재 최소 값 * 현재-다음 거리. 현재최소값 갱신
-// 필요한 변수 : 현재 제일 낮은 기름값. 현재까지 기름값. 현재 위치.
-let minPrice = price[0];
-let currentPrice = BigInt(0);
+const op = new Map([
+  ["D", (n) => (n * 2) % 10000],
+  ["S", (n) => (n === 0 ? 9999 : n - 1)],
+  ["L", (n) => (n % 1000) * 10 + Math.floor(n / 1000)],
+  ["R", (n) => (n % 10) * 1000 + Math.floor(n / 10)],
+]);
 
+let line = 1;
+let answer = [];
+for (let t = 0; t < T; t++) {
+  const [A, B] = input[line++].split(" ").map(Number);
 
-for(let i = 1; i<city; i++){ // 각 위치 쭉 진행
-  currentPrice += BigInt(minPrice) * BigInt(distance[i-1]); // 다음 거리까지 가격 계산
-  if(minPrice > BigInt(price[i])){
-    minPrice = BigInt(price[i]); // 다음 기름값이 더 싸다면 최소 기름값 갱신
+  const prev = Array(10000).fill(-1);
+  const prevOp = Array(10000).fill("");
+
+  const queue = Array(10000);
+  let head = 0;
+  let tail = 0;
+
+  prev[A] = A;
+  queue[tail++] = A;
+
+  while (head < tail) {
+    const cur = queue[head++];
+
+    if (cur === B) break;
+
+    for (const [ch, fn] of op) {
+      const next = fn(cur);
+
+      if (prev[next] !== -1) continue;
+
+      prev[next] = cur;
+      prevOp[next] = ch;
+      queue[tail++] = next;
+    }
   }
+
+  let cur = B;
+  let ans = [];
+
+  while (cur !== A) {
+    ans.push(prevOp[cur]);
+    cur = prev[cur];
+  }
+
+  answer.push(ans.reverse().join(""));
 }
 
-console.log(String(currentPrice));
-
+console.log(answer.join("\n"));
